@@ -1,9 +1,3 @@
-/*
- * mod8i8o.h
- *
- *  Created on: 19-Oct-2021
- *      Author: nataraj
- */
 
 #ifndef MOD8I8O_H_
 #define MOD8I8O_H_
