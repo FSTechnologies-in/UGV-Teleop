@@ -1,9 +1,3 @@
-/*
- * main.cpp
- *
- *  Created on: 19-Oct-2021
- *      Author: nataraj
- */
 
 #include <stdio.h>
 #include <iostream>
