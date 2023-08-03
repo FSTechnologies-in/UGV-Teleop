@@ -1,9 +1,3 @@
-/*
- * mod8i8o.cpp
- *
- *  Created on: 19-Oct-2021
- *      Author: nataraj
- */
 
 #include "mod8i8o.h"
 
