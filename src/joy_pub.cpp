@@ -81,14 +81,15 @@ class RemoteTeleop {
     ROS_INFO("right forward\n");  
 /* Both linear and angular is less than zero enable reverse light */
    if(l<0&&r<0){
+/*Enable Realy no. 5 for Rear light(Reverse light)*/
       modbus(1,MOD8I8O_W_R_OUTPUT_BIT5,PIN_SET,1);
    }
    else{
+/*Disable Realy no. 5 for Rear light(Reverse light)*/
       modbus(1,MOD8I8O_W_R_OUTPUT_BIT5,PIN_CLR,1);
    }
   }
   // Both value comes zero else part will execute and publish zero data to arduino
-  else  {
   else  {
     std_msgs::Bool brake_apply;
     brake_apply.data = true;
@@ -121,7 +122,6 @@ class RemoteTeleop {
       value.data=true;
     modbus(1,MOD8I8O_W_R_OUTPUT_BIT1,PIN_SET,1);// Modbus relay 1 Enable
 
-     // pub_light.publish(value);
       ROS_INFO("Front top Light :%d",light_1);
      }
       /* light variable true at the same time front light flag is two 
@@ -156,8 +156,6 @@ class RemoteTeleop {
       value.data=1;
     modbus(1,MOD8I8O_W_R_OUTPUT_BIT2,PIN_SET,1);// Modbus relay 2 Enable
     modbus(1,MOD8I8O_W_R_OUTPUT_BIT3,PIN_CLR,1);// Modbus relay 3 Disable
-
-     // pub_multicolor.publish(value);
       ROS_INFO("White color :%d",light_2);
      }
      /* fog light variable true at the same time front light flag is one 
@@ -169,7 +167,6 @@ class RemoteTeleop {
         value.data=2;
     modbus(1,MOD8I8O_W_R_OUTPUT_BIT2,PIN_CLR,1);// Modbus relay 2 Disable
     modbus(1,MOD8I8O_W_R_OUTPUT_BIT3,PIN_SET,1);// Modbus relay 3 Enable
-      // pub_multicolor.publish(value);
       ROS_INFO("Yellow color :%d",light_2);
      
      }
@@ -180,7 +177,6 @@ class RemoteTeleop {
        
        light_2=false;
         value.data=0;
-       //pub_multicolor.publish(value);
     modbus(1,MOD8I8O_W_R_OUTPUT_BIT2,PIN_CLR,1);// Modbus relay 2 Disable
     modbus(1,MOD8I8O_W_R_OUTPUT_BIT3,PIN_CLR,1);// Modbus relay 3 Disable
       ROS_INFO("Lights off:%d",light_2);
