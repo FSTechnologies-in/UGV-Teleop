@@ -4,7 +4,7 @@
 #include <iostream>
 #include "modbus.cpp"
 #include <unistd.h>
-int success=1;
+int brake_success=1;
 long long forward_interval=0;
 long long brake_interval=0;
 long long reverse_interval=0;
@@ -33,8 +33,8 @@ void  brake_callback(const std_msgs::Bool& msg)
 	/* Engage the Ring Red light for Relay Number 4*/
      modbus(1,MOD8I8O_W_R_OUTPUT_BIT4,PIN_SET,1);
     
-  success=msg.data;// Brake state assign global variable to access main function
-  ROS_INFO("%d",success);
+   brake_success=msg.data;// Brake state assign global variable to access main function
+  ROS_INFO("%d", brake_success);
   stop_flag=0;
  
 }
@@ -65,7 +65,7 @@ ros::Rate loop_rate(1);
   while(ros::ok())
   {
  /* Once brake callback function is called if condition is execute */
-  if(success)
+  if( brake_success)
   {
    
     if(stop_flag==0)
@@ -132,7 +132,7 @@ ros::Rate loop_rate(1);
       stop_flag=4;
 	  /* Disengage the Ring Red light for Relay Number 4*/
        modbus(1,MOD8I8O_W_R_OUTPUT_BIT4,PIN_CLR,1);
-      success=0;
+       brake_success=0;
     }
     }
   }
