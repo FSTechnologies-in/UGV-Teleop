@@ -27,12 +27,10 @@ int modbus(int device_id,int pin, PinValue value, int mode) {
 	//Creating Modbus port
 	RS485_Modbus_RTU test1(inputDevparam);
 	modbus_t *ctx = test1.getDev();
-	MOD8I8O ioDev1, ioDev2, ioDev3;
+	MOD8I8O ioDev1;
 	ioDev1.mapModbus(test1.isModbusOpen(), ctx, 1);
-	ioDev2.mapModbus(test1.isModbusOpen(), ctx, 2);
-	ioDev3.mapModbus(test1.isModbusOpen(), ctx, 3);
 
-	errorNum = ioDev1.setOutputPin(pin, value);
+	errorNum = ioDev1.setOutputPin(pin, value);// Modbus Relay SET/CLEAR Based on Actual parameter in Joystick node
 	if (errorNum > 0) {
 		printf("setOutputPin set success\n");
 		return 1;
