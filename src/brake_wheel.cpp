@@ -29,7 +29,7 @@ void  callback_limitswitch(const std_msgs::Bool& msg)
 */
 void  brake_callback(const std_msgs::Bool& msg)
   {
-    printf("Brake Applied\n\r");
+    ROS_INFO("Brake Applied\n\r");
 	/* Engage the Ring Red light for Relay Number 4*/
      modbus(1,MOD8I8O_W_R_OUTPUT_BIT4,PIN_SET,1);
     
