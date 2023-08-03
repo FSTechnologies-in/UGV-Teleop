@@ -1,9 +1,4 @@
-/*
- * rs485_modbus_rtu.h
- *
- *  Created on: 15-Sep-2021
- *      Author: nataraj
- */
+
 
 #ifndef RS485_MODBUS_RTU_H_
 #define RS485_MODBUS_RTU_H_
