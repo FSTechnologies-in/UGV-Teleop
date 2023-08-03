@@ -1,9 +1,4 @@
-/*
- * rs485_modbus_rtu.cpp
- *
- *  Created on: 15-Sep-2021
- *      Author: nataraj
- */
+
 
 #include <rs485_modbus_rtu.h>
 
