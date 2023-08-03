@@ -1,0 +1,4 @@
+<launch>
+        <node pkg="teleop" type="teleop_node" name="joy_pub" output="screen"> </node>
+        <node pkg="teleop" type="brake_node" name="brake_exe" output="screen"> </node>
+</launch>
