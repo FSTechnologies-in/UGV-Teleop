@@ -30,7 +30,7 @@ void  callback_limitswitch(const std_msgs::Bool& msg)
 void  brake_callback(const std_msgs::Bool& msg)
   {
     ROS_INFO("Brake Applied\n\r");
-	/* Engage the Ring Red light for Relay Number 4*/
+  /* Engage the Ring Red light for Relay Number 4*/
      modbus(1,MOD8I8O_W_R_OUTPUT_BIT4,PIN_SET,1);
     
    brake_success=msg.data;// Brake state assign global variable to access main function
@@ -65,13 +65,13 @@ ros::Rate loop_rate(1);
   while(ros::ok())
   {
  /* Once brake callback function is called if condition is execute */
-  if( brake_success)
+  if(brake_success)
   {
    
     if(stop_flag==0)
     {
-		/* Enage Forward break -> Relay Number 7
-		   Disengage Reverse Break -> Relay Number 8*/
+    /* Enage Forward break -> Relay Number 7
+       Disengage Reverse Break -> Relay Number 8*/
       modbus(1,MOD8I8O_W_R_OUTPUT_BIT7,PIN_SET,1);
       modbus(1,MOD8I8O_W_R_OUTPUT_BIT8,PIN_CLR,1);
       //sleep(1);
@@ -82,13 +82,13 @@ ros::Rate loop_rate(1);
     {
       /* Wait for Some amount of time for Break holding*/
     forward_interval++;
-    if(forward_interval>100000000||BRAKE_APPLY_flag)
+    if(forward_interval>80000000||BRAKE_APPLY_flag)
     {
       //sleep(1);
       ROS_INFO("Break hold");
       BRAKE_APPLY_flag=0;
-	  /* Disengage Forward break -> Relay Number 7
-		 Disengage Reverse Break -> Relay Number 8*/
+    /* Disengage Forward break -> Relay Number 7
+     Disengage Reverse Break -> Relay Number 8*/
       modbus(1,MOD8I8O_W_R_OUTPUT_BIT7,PIN_CLR,1);
       modbus(1,MOD8I8O_W_R_OUTPUT_BIT8,PIN_CLR,1);
       forward_interval=0;
@@ -100,13 +100,13 @@ ros::Rate loop_rate(1);
     if(stop_flag==2)
     {
      brake_interval++;
-	 /* Wait for Some amount of time for Break Reverse*/
-    if(brake_interval>10000000)
+   /* Wait for Some amount of time for Break Reverse*/
+    if(brake_interval>100000000)
     {
       //sleep(1);
       ROS_INFO("Break rev");
-	  /* Disengage Forward break -> Relay Number 7
-		 Engage Reverse Break -> Relay Number 8*/
+    /* Disengage Forward break -> Relay Number 7
+     Engage Reverse Break -> Relay Number 8*/
       modbus(1,MOD8I8O_W_R_OUTPUT_BIT7,PIN_CLR,1);
       modbus(1,MOD8I8O_W_R_OUTPUT_BIT8,PIN_SET,1);
        forward_interval=0;
@@ -118,19 +118,19 @@ ros::Rate loop_rate(1);
     if(stop_flag==3)
     {
      reverse_interval++;
-	 /* Wait for Some amount of time for Break Stop*/
-    if(reverse_interval>10000000)
+   /* Wait for Some amount of time for Break Stop*/
+    if(reverse_interval>100000000)
     {
       ROS_INFO("Break Stops");
-	  /* Disengage Forward break -> Relay Number 7
-		 Disengage Reverse Break -> Relay Number 8*/
+    /* Disengage Forward break -> Relay Number 7
+     Disengage Reverse Break -> Relay Number 8*/
       modbus(1,MOD8I8O_W_R_OUTPUT_BIT7,PIN_CLR,1);
       modbus(1,MOD8I8O_W_R_OUTPUT_BIT8,PIN_CLR,1);
        forward_interval=0;
        brake_interval=0;
        reverse_interval=0;
       stop_flag=4;
-	  /* Disengage the Ring Red light for Relay Number 4*/
+    /* Disengage the Ring Red light for Relay Number 4*/
        modbus(1,MOD8I8O_W_R_OUTPUT_BIT4,PIN_CLR,1);
        brake_success=0;
     }
