@@ -89,15 +89,15 @@ class RemoteTeleop {
   }
   // Both value comes zero else part will execute and publish zero data to arduino
   else  {
-      pub.publish(msg);// Publish linear and angular as zero to arduino
-    sleep(0.5);
-    pub.publish(msg);
+     modbus(1,MOD8I8O_W_R_OUTPUT_BIT5,PIN_CLR,1);
+     pub.publish(msg);// Publish linear and angular as zero to arduino
      sleep(0.5);
-     modbus(1,MOD8I8O_W_R_OUTPUT_BIT5,PIN_CLR,1);
+     modbus(1,MOD8I8O_W_R_OUTPUT_BIT7,PIN_SET,1);
+     modbus(1,MOD8I8O_W_R_OUTPUT_BIT8,PIN_SET,1);
      sleep(1);
-     modbus(1,MOD8I8O_W_R_OUTPUT_BIT5,PIN_CLR,1);
-     sleep(1);	  
-	  ROS_INFO("STOP");
+     modbus(1,MOD8I8O_W_R_OUTPUT_BIT7,PIN_CLR,1);
+     modbus(1,MOD8I8O_W_R_OUTPUT_BIT8,PIN_CLR,1);
+     ROS_INFO("STOP");
   }
          
     }
