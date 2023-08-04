@@ -23,7 +23,6 @@ class RemoteTeleop {
     private:
    /* Creating publisher and subscriber variables */
     ros::Publisher pub;
-    ros::Publisher brake_node;
     ros::Subscriber joystick_subscriber;
     ros::Subscriber button1_subscriber;
     ros::Subscriber button2_subscriber;
@@ -40,7 +39,6 @@ class RemoteTeleop {
      
       RemoteTeleop(ros::NodeHandle *nh) {
          /* Publish topics publishing to Arduino Controller */
-         brake_node=nh->advertise<std_msgs::Bool>("/brake/joystick", 100);  // brake publish topic creation 
         pub = nh->advertise<geometry_msgs::Twist>("/linear/angular", 100);  // linear and angular value publish topic
 		/* Subscriber topics subscribing the data from ROS Mobile App  */
         joystick_subscriber = nh->subscribe("/cmd_vel", 2, &RemoteTeleop::callback_joy, this);// Linear and angular value subscribing
@@ -91,14 +89,14 @@ class RemoteTeleop {
   }
   // Both value comes zero else part will execute and publish zero data to arduino
   else  {
-    std_msgs::Bool brake_apply;
-    brake_apply.data = true;
-	/* Both linear and angular is zero apply break to publish data for break node */
-    brake_node.publish(brake_apply);
       pub.publish(msg);// Publish linear and angular as zero to arduino
     sleep(0.5);
     pub.publish(msg);
      sleep(0.5);
+     modbus(1,MOD8I8O_W_R_OUTPUT_BIT5,PIN_CLR,1);
+     sleep(1);
+     modbus(1,MOD8I8O_W_R_OUTPUT_BIT5,PIN_CLR,1);
+     sleep(1);	  
 	  ROS_INFO("STOP");
   }
          
