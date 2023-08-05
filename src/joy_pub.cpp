@@ -23,12 +23,25 @@ class RemoteTeleop {
     private:
    /* Creating publisher and subscriber variables */
     ros::Publisher pub;
+    ros::Publisher pwm_1;
+    ros::Publisher pwm_2;
+    ros::Publisher pwm_3;
+
     ros::Subscriber joystick_subscriber;
     ros::Subscriber button1_subscriber;
     ros::Subscriber button2_subscriber;
+    ros::Subscriber pwm_1_joystick;
+    ros::Subscriber pwm_2_joystick;
+    ros::Subscriber pwm_3_joystick;
+
      /* Flag variable of light and debug purpose of pwm variable */
       int front_light_flag=0;
       int front_fog_light_flag=0;
+      int pwm_1_inc=0;
+      int pwm_2_inc=0;
+
+      int pwm_3_inc=0;
+
       float l=0;
       float r=0;
       uint16_t lPwm = 0;
@@ -40,10 +53,17 @@ class RemoteTeleop {
       RemoteTeleop(ros::NodeHandle *nh) {
          /* Publish topics publishing to Arduino Controller */
         pub = nh->advertise<geometry_msgs::Twist>("/linear/angular", 100);  // linear and angular value publish topic
-		/* Subscriber topics subscribing the data from ROS Mobile App  */
+        pwm_1 = nh->advertise<std_msgs::Int16>("/pwm/low/joystick", 100);  // linear and angular value publish topic
+        pwm_2 = nh->advertise<std_msgs::Int16>("/pwm/medium/joystick", 100);  // linear and angular value publish topic
+        pwm_3 = nh->advertise<std_msgs::Int16>("/pwm/high/joystick", 100);  // linear and angular value publish topic
+
+    /* Subscriber topics subscribing the data from ROS Mobile App  */
         joystick_subscriber = nh->subscribe("/cmd_vel", 2, &RemoteTeleop::callback_joy, this);// Linear and angular value subscribing
         button1_subscriber = nh->subscribe("btn1topic", 2, &RemoteTeleop::callback_button1, this);// front top light data subscribing
         button2_subscriber = nh->subscribe("btn2topic", 2, &RemoteTeleop::callback_button2, this);// front fog light data subscribing
+        pwm_1_joystick = nh->subscribe("/pwm/low", 2, &RemoteTeleop::pwm_1_callback, this);// front fog light data subscribing
+        pwm_2_joystick = nh->subscribe("/pwm/medium", 2, &RemoteTeleop::pwm_2_callback, this);// front fog light data subscribing
+        pwm_3_joystick = nh->subscribe("/pwm/high", 2, &RemoteTeleop::pwm_3_callback, this);// front fog light data subscribing
 
   float mapPwm(float x, float out_min, float out_max);// Mapping pwm function prototype
      
@@ -54,7 +74,7 @@ class RemoteTeleop {
     {
        return x * (out_max - out_min) + out_min;
     }
- // callback function of Joystick ROS MOBILE App and publishing to arduino rosserial node	
+ // callback function of Joystick ROS MOBILE App and publishing to arduino rosserial node 
     void callback_joy(const geometry_msgs::Twist& msg) {    
     
   ROS_INFO("Linear:%lf , Angular:%lf\n",msg.linear.x,msg.angular.z);// printing linear/angular information
@@ -62,7 +82,7 @@ class RemoteTeleop {
   if(msg.linear.x>0 || msg.linear.x<0)
   {
      pub.publish(msg);// Publish linear and angular
-	 /* Below codes ard debugging purpose */
+   /* Below codes ard debugging purpose */
      l = (msg.linear.x - msg.angular.z) / 2;
          r = (msg.linear.x + msg.angular.z) / 2;
    lPwm = mapPwm(fabs(l), 80,120);
@@ -92,9 +112,12 @@ class RemoteTeleop {
      modbus(1,MOD8I8O_W_R_OUTPUT_BIT5,PIN_CLR,1);
      pub.publish(msg);// Publish linear and angular as zero to arduino
      sleep(0.5);
+     pub.publish(msg);// Publish linear and angular as zero to arduino
+     modbus(1,MOD8I8O_W_R_OUTPUT_BIT4,PIN_SET,1);
      modbus(1,MOD8I8O_W_R_OUTPUT_BIT7,PIN_SET,1);
      modbus(1,MOD8I8O_W_R_OUTPUT_BIT8,PIN_SET,1);
-     sleep(1);
+     sleep(3);
+     modbus(1,MOD8I8O_W_R_OUTPUT_BIT4,PIN_CLR,1);
      modbus(1,MOD8I8O_W_R_OUTPUT_BIT7,PIN_CLR,1);
      modbus(1,MOD8I8O_W_R_OUTPUT_BIT8,PIN_CLR,1);
      ROS_INFO("STOP");
@@ -138,7 +161,7 @@ class RemoteTeleop {
    /* Callback function of front fog/white light and ROS MOBILE App and publishing to arduino rosserial node */
    void callback_button2(const std_msgs::Bool& msg) 
    {
-        	
+          
      bool light_2=false;
      std_msgs::Int16 value;
       light_2= msg.data;// ROS Mobile data stored in Integer variable
@@ -180,7 +203,101 @@ class RemoteTeleop {
       ROS_INFO("Lights off:%d",light_2);
        front_fog_light_flag=0;
      }
-   }  
+   }
+
+   void pwm_1_callback(const std_msgs::Bool& msg) 
+   {
+    bool pwm=false;
+     std_msgs::Int16 value; 
+      pwm= msg.data; // ROS Mobile data stored in boolean variable
+     if(pwm==true)
+     {
+       pwm_1_inc++;// light variable true means count the front light flag
+     } 
+   /* light variable true at the same time front light flag is one 
+     publish light on command send to arduino */
+     if(pwm_1_inc==1 && pwm==true) 
+     {
+      pwm=true;
+      value.data=70;
+      pwm_1.publish(value);
+      ROS_INFO("pwm 1:%d",pwm);
+     }
+      /* light variable true at the same time front light flag is two 
+     publish light off command send to arduino */
+     if(pwm_1_inc==2 && pwm==true)
+     {
+       
+       pwm=false;
+        value.data=70;
+      pwm_1.publish(value);
+
+      ROS_INFO("pwm 1:%d",pwm);
+      pwm_1_inc=0;
+     }
+   } 
+   void pwm_2_callback(const std_msgs::Bool& msg) 
+   {
+      bool pwm=false;
+     std_msgs::Int16 value; 
+      pwm= msg.data; // ROS Mobile data stored in boolean variable
+     if(pwm==true)
+     {
+       pwm_2_inc++;// light variable true means count the front light flag
+     } 
+   /* light variable true at the same time front light flag is one 
+     publish light on command send to arduino */
+     if(pwm_2_inc==1 && pwm==true) 
+     {
+      pwm=true;
+      value.data=90;
+      pwm_2.publish(value);
+      ROS_INFO("pwm 2:%d",pwm);
+     }
+      /* light variable true at the same time front light flag is two 
+     publish light off command send to arduino */
+     if(pwm_2_inc==2 && pwm==true)
+     {
+       
+       pwm=false;
+        value.data=90;
+            pwm_2.publish(value);
+
+      ROS_INFO("pwm 2:%d",pwm);
+      pwm_2_inc=0;
+     }
+   } 
+   void pwm_3_callback(const std_msgs::Bool& msg) 
+   {
+     bool pwm=false;
+     std_msgs::Int16 value; 
+      pwm= msg.data; // ROS Mobile data stored in boolean variable
+     if(pwm==true)
+     {
+       pwm_3_inc++;// light variable true means count the front light flag
+     } 
+   /* light variable true at the same time front light flag is one 
+     publish light on command send to arduino */
+     if(pwm_3_inc==1 && pwm==true) 
+     {
+      pwm=true;
+      value.data=135;
+      pwm_3.publish(value);
+      ROS_INFO("pwm 3:%d",pwm);
+     }
+      /* light variable true at the same time front light flag is two 
+     publish light off command send to arduino */
+     if(pwm_3_inc==2 && pwm==true)
+     {
+       
+       pwm=false;
+        value.data=135;
+        pwm_3.publish(value);
+
+      ROS_INFO("pwm 3:%d",pwm);
+      pwm_3_inc=0;
+     }
+   } 
 };
 
 int main (int argc, char **argv)
